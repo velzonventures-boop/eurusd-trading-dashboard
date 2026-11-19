@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EUR/USD Smart Trading Dashboard</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#e5e7eb;font-family:Arial,sans-serif}
+header{padding:22px;background:#111c30;border-bottom:1px solid #29364d}
+header h1{margin:0;font-size:23px}
+header p{color:#9ca3af;font-size:13px}
+main{max-width:1100px;margin:auto;padding:18px}
+.card{background:#111c30;border:1px solid #29364d;border-radius:12px;padding:17px;margin-bottom:16px}
+h2{font-size:17px;margin:0 0 15px}
+h3{font-size:14px;color:#93c5fd;margin:15px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+label{display:block;color:#aebbd0;font-size:12px;margin-bottom:5px}
+input,select{width:100%;padding:10px;background:#0b1220;color:white;border:1px solid #35445e;border-radius:7px;margin-bottom:10px}
+input[type=file]{font-size:12px}
+input[type=checkbox]{width:auto;margin:0 7px 0 0}
+.check{display:flex;align-items:center;font-size:13px;margin:10px 0}
+button{background:#2563eb;color:white;border:0;padding:11px 16px;border-radius:7px;cursor:pointer;font-weight:bold}
+button.secondary{background:#334155}
+button.danger{background:#991b1b}
+button:hover{opacity:.88}
+.small{font-size:12px;color:#94a3b8}
+.result{font-size:25px;font-weight:bold;color:#60a5fa}
+.good{color:#4ade80}.warn{color:#fbbf24}.bad{color:#f87171}
+.preview{width:100%;max-height:180px;object-fit:contain;background:#080d17;border-radius:7px;margin:5px 0 12px}
+.metric{background:#0b1220;padding:12px;border-radius:8px}
+.metric span{display:block;font-size:12px;color:#94a3b8}
+.metric strong{font-size:19px;display:block;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{padding:9px;border-bottom:1px solid #29364d;text-align:left}
+footer{text-align:center;color:#64748b;font-size:11px;padding:20px}
+@media(max-width:600px){main{padding:10px}.card{padding:13px}header h1{font-size:19px}}
+</style>
+</head>
+<body>
+<header>
+<h1>EUR/USD Smart Trading Dashboard</h1>
+<p>Multi-timeframe analysis · Risk management · Trade journal</p>
+</header>
+<main>
+
+<div class="card">
+<h2>1. Market prices</h2>
+<div class="grid">
+<div><label>Account balance (USD)</label><input id="balance" type="number" value="30" step="0.01"></div>
+<div><label>Risk per trade (USD)</label><input id="risk" type="number" value="0.50" step="0.01"></div>
+<div><label>BID price</label><input id="bid" type="number" step="0.00001" placeholder="e.g. 1.08500"></div>
+<div><label>ASK price</label><input id="ask" type="number" step="0.00001" placeholder="e.g. 1.08512"></div>
+</div>
+<p class="small">Enter current broker prices manually. BID is the sell price; ASK is the buy price.</p>
+<div class="grid">
+<div class="metric"><span>Spread</span><strong id="spread">—</strong></div>
+<div class="metric"><span>Risk percentage</span><strong id="riskpct">—</strong></div>
+</div>
+</div>
+
+<div class="card">
+<h2>2. Upload your chart screenshots</h2>
+<p class="small">Upload screenshots from your trading platform. Images are previewed in this browser; this version does not interpret them with AI.</p>
+<div class="grid">
+<div><h3>H1 — Main trend</h3><input type="file" accept="image/*" onchange="preview(this,'p1')"><img id="p1" class="preview" hidden></div>
+<div><h3>M30 — Setup</h3><input type="file" accept="image/*" onchange="preview(this,'p2')"><img id="p2" class="preview" hidden></div>
+<div><h3>M15 — Confirmation</h3><input type="file" accept="image/*" onchange="preview(this,'p3')"><img id="p3" class="preview" hidden></div>
+<div><h3>M5 — Entry trigger</h3><input type="file" accept="image/*" onchange="preview(this,'p4')"><img id="p4" class="preview" hidden></div>
+</div>
+</div>
+
+<div class="card">
+<h2>3. Indicator readings</h2>
+<p class="small">Read the latest values from the right edge of each chart and enter them here.</p>
+<div class="grid">
+<div><h3>H1</h3><label>EMA 50</label><input id="h1e50" type="number" step="0.00001"><label>EMA 200</label><input id="h1e200" type="number" step="0.00001"><label>RSI 14</label><input id="h1rsi" type="number" step="0.01"><label>ATR 14</label><input id="h1atr" type="number" step="0.00001"></div>
+<div><h3>M30</h3><label>EMA 50</label><input id="m30e50" type="number" step="0.00001"><label>EMA 200</label><input id="m30e200" type="number" step="0.00001"><label>RSI 14</label><input id="m30rsi" type="number" step="0.01"><label>ATR 14</label><input id="m30atr" type="number" step="0.00001"></div>
+<div><h3>M15</h3><label>EMA 50</label><input id="m15e50" type="number" step="0.00001"><label>EMA 200</label><input id="m15e200" type="number" step="0.00001"><label>RSI 14</label><input id="m15rsi" type="number" step="0.01"><label>ATR 14</label><input id="m15atr" type="number" step="0.00001"></div>
+<div><h3>M5</h3><label>EMA 50</label><input id="m5e50" type="number" step="0.00001"><label>EMA 200</label><input id="m5e200" type="number" step="0.00001"><label>RSI 14</label><input id="m5rsi" type="number" step="0.01"><label>ATR 14</label><input id="m5atr" type="number" step="0.00001"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>4. Structure and confirmation</h2>
+<div class="grid">
+<div>
+<h3>Market direction</h3>
+<label>H1 direction</label><select id="h1trend"><option value="">Select</option><option>Bullish</option><option>Bearish</option><option>Sideways</option></select>
+<label>M30 direction</label><select id="m30trend"><option value="">Select</option><option>Bullish</option><option>Bearish</option><option>Sideways</option></select>
+<label>M15 structure</label><select id="bos"><option value="">Select</option><option>Confirmed bullish BOS</option><option>Confirmed bearish BOS</option><option>CHoCH</option><option>No confirmation</option></select>
+<label>M5 entry trigger</label><select id="trigger"><option value="">Select</option><option>Bullish retest and rejection</option><option>Bearish retest and rejection</option><option>No trigger</option></select>
+</div>
+<div>
+<h3>Checklist</h3>
+<label class="check"><input type="checkbox" id="retest"> Retest confirmed</label>
+<label class="check"><input type="checkbox" id="candle"> Strong confirmation candle</label>
+<label class="check"><input type="checkbox" id="level"> Entry near support/resistance</label>
+<label class="check"><input type="checkbox" id="news"> Major news checked</label>
+<label class="check"><input type="checkbox" id="spreadok"> Spread acceptable</label>
+<p class="small">Only tick a condition when you have checked it on your chart.</p>
+</div>
+</div>
+<button onclick="analyse()">Analyse setup</button>
+</div>
+
+<div class="card">
+<h2>5. Setup assessment</h2>
+<div class="grid">
+<div class="metric"><span>Confluence score</span><strong id="score">—</strong></div>
+<div class="metric"><span>Suggested direction</span><strong id="direction">—</strong></div>
+<div class="metric"><span>Decision</span><strong id="decision">Awaiting analysis</strong></div>
+</div>
+<p id="explanation" class="small">Complete your readings and checklist, then select Analyse setup.</p>
+<p class="small">The score measures checklist confluence only. It is NOT a win probability or a guarantee of profit.</p>
+</div>
+
+<div class="card">
+<h2>6. Trade calculator</h2>
+<div class="grid">
+<div><label>Direction</label><select id="side"><option value="BUY">BUY</option><option value="SELL">SELL</option></select></div>
+<div><label>Entry price</label><input id="entry" type="number" step="0.00001" placeholder="Entry"></div>
+<div><label>Stop loss</label><input id="sl" type="number" step="0.00001" placeholder="Stop loss"></div>
+<div><label>Take profit 1</label><input id="tp1" type="number" step="0.00001" placeholder="TP1"></div>
+<div><label>Take profit 2</label><input id="tp2" type="number" step="0.00001" placeholder="TP2"></div>
+<div><label>Take profit 3</label><input id="tp3" type="number" step="0.00001" placeholder="TP3"></div>
+</div>
+<button onclick="calculate()">Calculate trade</button>
+<div class="grid" style="margin-top:15px">
+<div class="metric"><span>Stop distance</span><strong id="distance">—</strong></div>
+<div class="metric"><span>Suggested lot size</span><strong id="lot">—</strong></div>
+<div class="metric"><span>Risk amount</span><strong id="riskout">—</strong></div>
+<div class="metric"><span>Reward/Risk TP1</span><strong id="rr1">—</strong></div>
+<div class="metric"><span>Reward/Risk TP2</span><strong id="rr2">—</strong></div>
+<div class="metric"><span>Reward/Risk TP3</span><strong id="rr3">—</strong></div>
+</div>
+<p id="calcmessage" class="small">Enter entry, stop loss and take-profit prices.</p>
+<button class="secondary" onclick="saveTrade()">Save trade to journal</button>
+</div>
+
+<div class="card">
+<h2>7. Trade journal</h2>
+<p class="small">Saved in this browser on this device.</p>
+<div style="overflow-x:auto">
+<table><thead><tr><th>Date</th><th>Side</th><th>Entry</th><th>SL</th><th>TP1</th><th>Lot</th><th>Score</th></tr></thead><tbody id="history"></tbody></table>
+</div>
+<br>
+<button class="secondary" onclick="exportCSV()">Export CSV</button>
+<button class="danger" onclick="clearHistory()">Clear history</button>
+</div>
+
+</main>
+<footer>EUR/USD Smart Trading Dashboard · Educational decision-support tool · Not financial advice</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+let lastScore=0,lastDirection="—",lastLot=0,lastRisk=0,lastRR=["—","—","—"];
+function preview(input,id){
+ const file=input.files[0];if(!file)return;
+ const img=$(id);img.src=URL.createObjectURL(file);img.hidden=false;
+}
+function val(id){return parseFloat($(id).value)}
+function analyse(){
+ let score=0,notes=[];
+ const h1=$("h1trend").value,m30=$("m30trend").value,bos=$("bos").value,trig=$("trigger").value;
+ let dir=(h1==="Bullish"||h1==="Bearish")?h1:"";
+ if(!dir){$("explanation").textContent="Select a clear H1 direction first.";return}
+ if(m30===dir)score+=20;else notes.push("M30 does not align with H1");
+ score+=25;
+ if(bos==="Confirmed "+dir.toLowerCase()+" BOS")score+=20;else notes.push("No matching confirmed M15 BOS");
+ if($("retest").checked)score+=15;else notes.push("Retest not confirmed");
+ if(trig.toLowerCase().startsWith(dir.toLowerCase()))score+=10;else notes.push("M5 trigger does not match direction");
+ if($("spreadok").checked)score+=5;else notes.push("Spread not confirmed acceptable");
+ const rsi=val("m15rsi");
+ if(Number.isFinite(rsi)&&rsi>=35&&rsi<=65)score+=5;else notes.push("M15 RSI is missing or outside 35–65");
+ if(!$("news").checked)notes.push("Major news not checked");
+ if(!$("candle").checked)notes.push("Confirmation candle not checked");
+ if(!$("level").checked)notes.push("Support/resistance location not checked");
+ lastScore=score;lastDirection=dir;
+ $("score").textContent=score+"/100";
+ $("direction").textContent=dir;
+ const pass=score>=80&&m30===dir&&bos==="Confirmed "+dir.toLowerCase()+" BOS"&&$("retest").checked&&trig.toLowerCase().startsWith(dir.toLowerCase())&&$("news").checked&&$("spreadok").checked;
+ $("decision").textContent=pass?"SETUP PASSES CHECKS":"NO TRADE";
+ $("decision").className=pass?"good":"warn";
+ $("explanation").textContent=notes.length?notes.join(" · "):"All selected checks passed. Verify the chart and risk before trading.";
+ $("side").value=dir==="Bullish"?"BUY":"SELL";
+}
+function calculate(){
+ const side=$("side").value,e=val("entry"),s=val("sl"),risk=val("risk");
+ if(![e,s,risk].every(Number.isFinite)||risk<=0){$("calcmessage").textContent="Enter a valid entry, stop loss and risk amount.";return false}
+ const dist=Math.abs(e-s),pips=dist*10000;
+ const valid=side==="BUY"?s<e:s>e;
+ if(!valid||dist===0){$("calcmessage").textContent="Invalid stop loss. BUY requires SL below entry; SELL requires SL above entry.";return false}
+ const rawLot=risk/(pips*10),lot=Math.floor(rawLot*100)/100;
+ const actualRisk=lot*pips*10;
+ $("distance").textContent=pips.toFixed(1)+" pips";
+ $("lot").textContent=lot.toFixed(2);
+ $("riskout").textContent="$"+actualRisk.toFixed(2);
+ lastLot=lot;lastRisk=actualRisk;
+ const tps=["tp1","tp2","tp3"];
+ lastRR=tps.map(id=>{
+ const tp=val(id);if(!Number.isFinite(tp))return "—";
+ const reward=side==="BUY"?(tp-e):(e-tp);
+ return reward>0?(reward/dist).toFixed(2)+"R":"Invalid";
+ });
+ ["rr1","rr2","rr3"].forEach((id,i)=>$(id).textContent=lastRR[i]);
+ $("calcmessage").textContent=lot<0.01?"Calculated lot is below 0.01. If your broker minimum is 0.01, do not increase it automatically; reduce risk or skip the trade.":"Estimate assumes EUR/USD pip value of $10 per 1.00 standard lot. Confirm your broker's contract size and minimum lot.";
+ return true;
+}
+function getHistory(){try{return JSON.parse(localStorage.getItem("eurusdJournal")||"[]")}catch(e){return []}}
+function saveTrade(){
+ if(!calculate())return;
+ const e=val("entry"),s=val("sl"),t=val("tp1");
+ const item={date:new Date().toLocaleString(),side:$("side").value,entry:e,sl:s,tp1:Number.isFinite(t)?t:"",lot:lastLot.toFixed(2),score:lastScore};
+ const h=getHistory();h.unshift(item);localStorage.setItem("eurusdJournal",JSON.stringify(h));renderHistory();
+ $("calcmessage").textContent="Trade plan saved in this browser.";
+}
+function renderHistory(){
+ $("history").innerHTML=getHistory().map(x=>`<tr><td>${x.date}</td><td>${x.side}</td><td>${x.entry}</td><td>${x.sl}</td><td>${x.tp1}</td><td>${x.lot}</td><td>${x.score}</td></tr>`).join("");
+}
+function exportCSV(){
+ const h=getHistory();if(!h.length){alert("No trades saved yet.");return}
+ const rows=[["Date","Side","Entry","SL","TP1","Lot","Score"],...h.map(x=>[x.date,x.side,x.entry,x.sl,x.tp1,x.lot,x.score])];
+ const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="eurusd-trade-journal.csv";a.click();URL.revokeObjectURL(a.href);
+}
+function clearHistory(){if(confirm("Delete all saved trades from this browser?")){localStorage.removeItem("eurusdJournal");renderHistory()}}
+function updatePrices(){
+ const b=val("bid"),a=val("ask"),r=val("risk"),bal=val("balance");
+ $("spread").textContent=Number.isFinite(a)&&Number.isFinite(b)&&a>=b?((a-b)*10000).toFixed(1)+" pips":"—";
+ $("riskpct").textContent=Number.isFinite(r)&&Number.isFinite(bal)&&bal>0?(r/bal*100).toFixed(2)+"%":"—";
+}
+["bid","ask","risk","balance"].forEach(id=>$(id).addEventListener("input",updatePrices));
+renderHistory();updatePrices();
+</script>
+</body>
+</html>
