@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EUR/USD Smart Trading Dashboard — Verified Readback v7.1</title>
+<title>EUR/USD Smart Trading Dashboard — Verified Readback v7.2</title>
 <style>
 :root {
   --bg:#0b1020;--p:#151e32;--p2:#1d2940;--t:#edf2ff;
@@ -69,8 +69,8 @@ hr{border:0;border-top:1px solid var(--b);margin:14px 0}
 </head>
 <body>
 <header>
-  <h1>EUR/USD Smart Trading Dashboard — v7.1</h1>
-  <p>Screenshot-based analysis • precision-checked latest-header OHLC association • H1 → M30 → M15 → M5 • Analysis support only</p>
+  <h1>EUR/USD Smart Trading Dashboard — v7.2</h1>
+  <p>Screenshot-based analysis • audited indicator legend mapping • one guided next screenshot • H1 → M30 → M15 → M5 • Analysis support only</p>
   <p id="localClock"></p>
   <p style="text-align:right"><a href="/logout" style="color:#6ba7ff">Logout</a></p>
 </header>
@@ -515,7 +515,10 @@ function render(data) {
       ${metric("ATR14", i.atr14)}${metric("ADX14", i.adx14)}
       </div><p class="section-note">MACD</p>${showMacd(i.macd)}
       <div class="section-note"><b>Data quality: ${esc(asText(x.indicatorAudit?.quality || "provisional"))}</b><br>
+      MACD mapping: ${x.indicatorAudit?.macdUsable ? "PASS — ordered legend sequence and formula check" : "EXCLUDED — ordered legend mapping or formula not verified"}<br>
       MACD check: ${esc(asText(x.indicatorAudit?.macdConsistency || "not checked"))}${x.indicatorAudit?.macdDifference==null?"":` · difference ${esc(Number(x.indicatorAudit.macdDifference).toFixed(5))}`}<br>
+      MACD mapped values (histogram / blue / orange): ${esc(asText(x.indicatorAudit?.macdLegendValuesInPrintedOrder || "Not verified"))}<br>
+      MACD field reassignment audit: ${(x.indicatorAudit?.macdNamedFieldMismatches||[]).length ? esc((x.indicatorAudit.macdNamedFieldMismatches||[]).map(v=>v.field).join(", ")) : "No reassignment detected / raw sequence unavailable"}<br>
       Duplicate EMA values: ${x.indicatorAudit?.duplicateEmaValues?"Yes — review labels":"No duplicate detected"}<br>
       Label/value conflicts: ${(x.indicatorAudit?.labelPairMismatches||[]).length ? esc((x.indicatorAudit.labelPairMismatches||[]).map(v=>v.field).join(", ")) : "None detected / evidence not supplied"}<br>
       ATR range check: ${x.indicatorAudit?.atrSuspiciousForTimeframe?"Flagged for review":"No extreme-value flag"}<br>
