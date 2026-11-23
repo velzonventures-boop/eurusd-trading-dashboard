@@ -1,376 +1,768 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EUR/USD Smart Trading Dashboard</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EUR/USD Smart Trading Dashboard — Verified Readback v7.1</title>
 <style>
+:root {
+  --bg:#0b1020;--p:#151e32;--p2:#1d2940;--t:#edf2ff;
+  --m:#9eaccb;--b:#2b3a55;--g:#26c281;--r:#f16b72;
+  --blue:#6ba7ff;--a:#ffbf4b;
+}
 *{box-sizing:border-box}
-body{margin:0;background:#0b1220;color:#e5e7eb;font-family:Arial,sans-serif}
-header{padding:22px;background:#111c30;border-bottom:1px solid #29364d}
-header h1{margin:0;font-size:23px}
-header p{color:#9ca3af;font-size:13px}
-main{max-width:1100px;margin:auto;padding:18px}
-.card{background:#111c30;border:1px solid #29364d;border-radius:12px;padding:17px;margin-bottom:16px}
-h2{font-size:17px;margin:0 0 15px}
-h3{font-size:14px;color:#93c5fd;margin:15px 0 8px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-label{display:block;color:#aebbd0;font-size:12px;margin-bottom:5px}
-input,select{width:100%;padding:10px;background:#0b1220;color:white;border:1px solid #35445e;border-radius:7px;margin-bottom:10px}
-input[type=file]{font-size:12px}
-input[type=checkbox]{width:auto;margin:0 7px 0 0}
-.check{display:flex;align-items:center;font-size:13px;margin:10px 0}
-button{background:#2563eb;color:white;border:0;padding:11px 16px;border-radius:7px;cursor:pointer;font-weight:bold}
-button.secondary{background:#334155}
-button.danger{background:#991b1b}
-button:hover{opacity:.88}
-.small{font-size:12px;color:#94a3b8}
-.result{font-size:25px;font-weight:bold;color:#60a5fa}
-.good{color:#4ade80}.warn{color:#fbbf24}.bad{color:#f87171}
-.preview{width:100%;max-height:180px;object-fit:contain;background:#080d17;border-radius:7px;margin:5px 0 12px}
-.metric{background:#0b1220;padding:12px;border-radius:8px}
-.metric span{display:block;font-size:12px;color:#94a3b8}
-.metric strong{font-size:19px;display:block;margin-top:6px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-td,th{padding:9px;border-bottom:1px solid #29364d;text-align:left}
-footer{text-align:center;color:#64748b;font-size:11px;padding:20px}
-@media(max-width:600px){main{padding:10px}.card{padding:13px}header h1{font-size:19px}}
+body{margin:0;background:var(--bg);color:var(--t);font:15px Arial,sans-serif}
+header{padding:20px 24px;background:#10182a;border-bottom:1px solid var(--b)}
+header h1{margin:0;font-size:22px}
+header p,.hint,.small{color:var(--m);font-size:13px;line-height:1.5}
+main{max-width:1350px;margin:auto;padding:18px}
+.card{background:var(--p);border:1px solid var(--b);border-radius:13px;padding:18px;margin-bottom:16px}
+.card h2{font-size:18px;margin:0 0 12px}
+.card h3{font-size:15px;margin:15px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.tile,.upload{background:var(--p2);border-radius:9px;padding:13px;min-width:0}
+.tile b{display:block;margin-top:7px;font-size:18px}
+.upload{border:1px dashed #526889}
+.upload input{width:100%;margin-top:8px;color:var(--m)}
+img.preview{display:none;width:100%;max-height:180px;object-fit:contain;margin-top:10px;border-radius:6px}
+button{border:0;border-radius:8px;padding:12px 17px;background:var(--blue);color:#071326;font-weight:bold;cursor:pointer;margin:5px 6px 5px 0}
+button.secondary{background:#334155;color:white}
+button.warn{background:#9a6a22;color:white}
+button:disabled{opacity:.5;cursor:wait}
+label{display:block;color:var(--m);font-size:12px;margin:0 0 5px}
+input[type=text],input[type=password],input[type=url]{width:100%;padding:11px;background:#0b1220;color:white;border:1px solid #35455e;border-radius:7px}
+.field{margin-bottom:10px}
+.status,.json{white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1220;border:1px solid var(--b);padding:12px;border-radius:8px;line-height:1.5}
+.json{font:12px/1.5 Consolas,monospace;max-height:480px;overflow:auto}
+.notice{border-left:4px solid var(--a);padding:10px;background:#2b2619;color:#ffe0a0;font-size:13px;line-height:1.5}
+.good{color:var(--g)}.bad{color:var(--r)}
+.actions{display:flex;flex-wrap:wrap;gap:5px}
+.capture-time{font-size:12px;color:var(--m);margin-top:8px}
+.price{font-size:25px;font-weight:bold;margin-top:8px;color:#ff6b6b}
+.price-label{font-size:12px;color:var(--m)}
+.subgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:9px}
+.metric{background:#0b1220;padding:9px;border-radius:7px;font-size:13px;overflow-wrap:anywhere}
+.metric strong{display:block;color:#fff;margin-top:5px;font-size:15px}
+.section-note{font-size:12px;color:var(--m);margin:8px 0}
+hr{border:0;border-top:1px solid var(--b);margin:14px 0}
+
+.zone-layout{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
+.zone-card{background:var(--p2);border-radius:10px;padding:14px;min-width:0}
+.zone-list{display:grid;gap:8px;margin-top:9px}
+.zone-row{background:#0b1220;border:1px solid var(--b);border-radius:8px;padding:9px;font-size:12px}
+.zone-row.support{border-left:4px solid #28c58b}
+.zone-row.resistance{border-left:4px solid #f16b72}
+.zone-row b{font-size:13px}
+.zone-meta{color:var(--m);margin-top:4px;line-height:1.45}
+.zone-track{height:14px;background:#0b1220;border-radius:8px;position:relative;margin:8px 0 5px;overflow:hidden;border:1px solid #35455e}
+.zone-band{position:absolute;top:1px;height:10px;border-radius:5px;min-width:3px}
+.zone-band.support{background:#28c58b}
+.zone-band.resistance{background:#f16b72}
+.zone-band.current{background:#ffd166;border:1px solid #fff;height:12px;top:0;width:3px;min-width:3px}
+.zone-scale{display:flex;justify-content:space-between;color:var(--m);font-size:10px;gap:8px}
+.zone-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--m);margin:8px 0}
+.zone-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+
+@media(max-width:600px){main{padding:10px}.card{padding:13px}}
 </style>
 </head>
 <body>
 <header>
-<h1>EUR/USD Smart Trading Dashboard</h1>
-<p>Multi-timeframe analysis · Risk management · Trade journal</p>
+  <h1>EUR/USD Smart Trading Dashboard — v7.1</h1>
+  <p>Screenshot-based analysis • precision-checked latest-header OHLC association • H1 → M30 → M15 → M5 • Analysis support only</p>
+  <p id="localClock"></p>
+  <p style="text-align:right"><a href="/logout" style="color:#6ba7ff">Logout</a></p>
 </header>
+
 <main>
+<section class="card">
+  <h2>1. Connection setup</h2>
+  <p class="hint">Enter your Cloudflare Worker URL and dashboard access token. Keep your OpenRouter API key in Cloudflare only.</p>
+  <div class="grid">
+    <div class="field">
+      <label>Cloudflare Worker URL</label>
+      <input id="workerUrl" type="url" placeholder="https://your-worker.workers.dev">
+    </div>
+    <div class="field">
+      <label>Dashboard access token</label>
+      <input id="dashboardToken" type="password" placeholder="Your DASHBOARD_ACCESS_TOKEN">
+    </div>
+  </div>
+  <button id="saveSettings">Save connection settings</button>
+  <span id="connectionState" class="small">Not configured</span>
+</section>
 
-<div class="card">
-<h2>1. Market prices</h2>
-<div class="grid">
-<div><label>Account balance (USD)</label><input id="balance" type="number" value="30" step="0.01"></div>
-<div><label>Risk per trade (USD)</label><input id="risk" type="number" value="0.50" step="0.01"></div>
-<div><label>BID price</label><input id="bid" type="number" step="0.00001" placeholder="e.g. 1.08500"></div>
-<div><label>ASK price</label><input id="ask" type="number" step="0.00001" placeholder="e.g. 1.08512"></div>
-</div>
-<p class="small">Enter current broker prices manually. BID is the sell price; ASK is the buy price.</p>
-<div class="grid">
-<div class="metric"><span>Spread</span><strong id="spread">—</strong></div>
-<div class="metric"><span>Risk percentage</span><strong id="riskpct">—</strong></div>
-</div>
-</div>
+<section class="card">
+  <h2>2. Upload four detailed close-ups</h2>
+  <p class="hint">Upload one clear TradingView close-up for H1, M30, M15 and M5. Crosshair alignment is disabled for now; do not position or align a crosshair for analysis. The Worker reads the visible top-left OHLC header as the latest-bar candidate and validates the OHLC values. The existing M5 screenshot is reused for the independent Section 14 quick-trade assessment. No additional M5 screenshot is required.</p>
+  <div class="grid">
+    <div class="upload"><b>H1 — Detailed close-up (main direction + structure)</b><input type="file" accept="image/png,image/jpeg,image/webp" data-tf="H1"><img class="preview" id="preview-H1"><div id="time-H1" class="capture-time">No detailed close-up uploaded</div><button class="secondary clear-one" data-clear="H1">Clear H1</button></div>
+    <div class="upload"><b>M30 — Detailed close-up (setup + momentum)</b><input type="file" accept="image/png,image/jpeg,image/webp" data-tf="M30"><img class="preview" id="preview-M30"><div id="time-M30" class="capture-time">No detailed close-up uploaded</div><button class="secondary clear-one" data-clear="M30">Clear M30</button></div>
+    <div class="upload"><b>M15 — Detailed close-up (confirmation + structure)</b><input type="file" accept="image/png,image/jpeg,image/webp" data-tf="M15"><img class="preview" id="preview-M15"><div id="time-M15" class="capture-time">No detailed close-up uploaded</div><button class="secondary clear-one" data-clear="M15">Clear M15</button></div>
+    <div class="upload"><b>M5 — Detailed close-up (entry trigger)</b><input type="file" accept="image/png,image/jpeg,image/webp" data-tf="M5"><img class="preview" id="preview-M5"><div id="time-M5" class="capture-time">No detailed close-up uploaded</div><button class="secondary clear-one" data-clear="M5">Clear M5</button></div>
+  </div>
+  <div class="small" style="margin-top:10px">Exactly four timeframe images are required. The M5 image is analysed twice: once for the main multi-timeframe assessment and separately for the independent Section 14 quick-trade assessment.</div>
+  <div class="notice" style="margin-top:14px">
+    Recommended screenshot: keep the latest candles, top-left O/H/L/C header, right price scale and all indicator panels visible. The dashboard attaches enlarged crops of the left legends and right price scale to help the vision model pair labels with values. Crosshair alignment is not checked or required. The Worker treats the visible top-left OHLC header as the latest-bar candidate and checks that Open, High, Low and Close are internally consistent. The bright red right-edge price marker is a separate current-price reference. Never guess unreadable digits.
+  </div>
+  <div class="actions">
+    <button id="analyseBtn">Analyse all charts</button>
+    <button id="recheckBtn" class="secondary">Check entry again</button>
+    <button id="clearBtn" class="warn">Clear all screenshots</button>
+  </div>
+  <div id="status" class="status">Ready. Upload four detailed close-ups: H1, M30, M15 and M5.</div>
+</section>
 
-<div class="card">
-<h2>2. Upload your chart screenshots</h2>
-<p class="small">Upload screenshots from your trading platform. Images are previewed in this browser; this version does not interpret them with AI.</p>
-<div class="grid">
-<div><h3>H1 — Main trend</h3><input type="file" accept="image/*" onchange="preview(this,'p1')"><img id="p1" class="preview" hidden></div>
-<div><h3>M30 — Setup</h3><input type="file" accept="image/*" onchange="preview(this,'p2')"><img id="p2" class="preview" hidden></div>
-<div><h3>M15 — Confirmation</h3><input type="file" accept="image/*" onchange="preview(this,'p3')"><img id="p3" class="preview" hidden></div>
-<div><h3>M5 — Entry trigger</h3><input type="file" accept="image/*" onchange="preview(this,'p4')"><img id="p4" class="preview" hidden></div>
-</div>
-</div>
+<section class="card">
+  <h2>3. Screenshot information</h2>
+  <p class="hint">Upload timestamps are recorded by this dashboard. They are not necessarily the original screenshot creation times.</p>
+  <div id="captureGrid" class="grid"><div class="tile">Waiting for screenshots.</div></div>
+</section>
 
-<div class="card">
-<h2>3. Indicator readings</h2>
-<p class="small">Read the latest values from the right edge of each chart and enter them here.</p>
-<div class="grid">
-<div><h3>H1</h3><label>EMA 50</label><input id="h1e50" type="number" step="0.00001"><label>EMA 200</label><input id="h1e200" type="number" step="0.00001"><label>RSI 14</label><input id="h1rsi" type="number" step="0.01"><label>ATR 14</label><input id="h1atr" type="number" step="0.00001"></div>
-<div><h3>M30</h3><label>EMA 50</label><input id="m30e50" type="number" step="0.00001"><label>EMA 200</label><input id="m30e200" type="number" step="0.00001"><label>RSI 14</label><input id="m30rsi" type="number" step="0.01"><label>ATR 14</label><input id="m30atr" type="number" step="0.00001"></div>
-<div><h3>M15</h3><label>EMA 50</label><input id="m15e50" type="number" step="0.00001"><label>EMA 200</label><input id="m15e200" type="number" step="0.00001"><label>RSI 14</label><input id="m15rsi" type="number" step="0.01"><label>ATR 14</label><input id="m15atr" type="number" step="0.00001"></div>
-<div><h3>M5</h3><label>EMA 50</label><input id="m5e50" type="number" step="0.00001"><label>EMA 200</label><input id="m5e200" type="number" step="0.00001"><label>RSI 14</label><input id="m5rsi" type="number" step="0.01"><label>ATR 14</label><input id="m5atr" type="number" step="0.00001"></div>
-</div>
-</div>
+<section class="card">
+  <h2>4. Current market price and latest candle</h2>
+  <p class="hint">One current-price reference is shown once, read only from the bright red numeric marker at the far right. Each detailed close-up is the primary source for structure, indicator labels and the red price marker.</p>
+  <div id="currentGrid" class="grid"><div class="tile">No analysis yet.</div></div>
+  <div id="priceAudit" class="status" style="margin-top:10px">Price consistency check appears after analysis.</div>
+</section>
 
-<div class="card">
-<h2>4. Structure and confirmation</h2>
-<div class="grid">
-<div>
-<h3>Market direction</h3>
-<label>H1 direction</label><select id="h1trend"><option value="">Select</option><option>Bullish</option><option>Bearish</option><option>Sideways</option></select>
-<label>M30 direction</label><select id="m30trend"><option value="">Select</option><option>Bullish</option><option>Bearish</option><option>Sideways</option></select>
-<label>M15 structure</label><select id="bos"><option value="">Select</option><option>Confirmed bullish BOS</option><option>Confirmed bearish BOS</option><option>CHoCH</option><option>No confirmation</option></select>
-<label>M5 entry trigger</label><select id="trigger"><option value="">Select</option><option>Bullish retest and rejection</option><option>Bearish retest and rejection</option><option>No trigger</option></select>
-</div>
-<div>
-<h3>Checklist</h3>
-<label class="check"><input type="checkbox" id="retest"> Retest confirmed</label>
-<label class="check"><input type="checkbox" id="candle"> Strong confirmation candle</label>
-<label class="check"><input type="checkbox" id="level"> Entry near support/resistance</label>
-<label class="check"><input type="checkbox" id="news"> Major news checked</label>
-<label class="check"><input type="checkbox" id="spreadok"> Spread acceptable</label>
-<p class="small">Only tick a condition when you have checked it on your chart.</p>
-</div>
-</div>
-<button onclick="analyse()">Analyse setup</button>
-</div>
+<section class="card">
+  <h2>5. Latest indicator readings</h2>
+  <p class="hint">These are readings at the latest/right edge of each indicator panel, not historical crosshair readings.</p>
+  <div id="indicatorGrid" class="grid"><div class="tile">No analysis yet.</div></div>
+</section>
 
-<div class="card">
-<h2>5. Setup assessment</h2>
-<div class="grid">
-<div class="metric"><span>Confluence score</span><strong id="score">—</strong></div>
-<div class="metric"><span>Suggested direction</span><strong id="direction">—</strong></div>
-<div class="metric"><span>Decision</span><strong id="decision">Awaiting analysis</strong></div>
-</div>
-<p id="explanation" class="small">Complete your readings and checklist, then select Analyse setup.</p>
-<p class="small">The score measures checklist confluence only. It is NOT a win probability or a guarantee of profit.</p>
-</div>
+<section class="card">
+  <h2>6. Advanced market structure</h2>
+  <p class="hint">Swing structure, liquidity pools/sweeps, order blocks, fair-value gaps and premium/discount are reported only when visible and supported by the screenshot. Unclear items remain Not readable.</p>
+  <div id="advancedStructureGrid" class="grid"><div class="tile">Advanced structure appears after analysis.</div></div>
+</section>
 
-<div class="card">
-<h2>6. Trade calculator</h2>
-<div class="grid">
-<div><label>Direction</label><select id="side"><option value="BUY">BUY</option><option value="SELL">SELL</option></select></div>
-<div><label>Entry price</label><input id="entry" type="number" step="0.00001" placeholder="Entry"></div>
-<div><label>Stop loss</label><input id="sl" type="number" step="0.00001" placeholder="Stop loss"></div>
-<div><label>Take profit 1</label><input id="tp1" type="number" step="0.00001" placeholder="TP1"></div>
-<div><label>Take profit 2</label><input id="tp2" type="number" step="0.00001" placeholder="TP2"></div>
-<div><label>Take profit 3</label><input id="tp3" type="number" step="0.00001" placeholder="TP3"></div>
-</div>
-<button onclick="calculate()">Calculate trade</button>
-<div class="grid" style="margin-top:15px">
-<div class="metric"><span>Stop distance</span><strong id="distance">—</strong></div>
-<div class="metric"><span>Suggested lot size</span><strong id="lot">—</strong></div>
-<div class="metric"><span>Risk amount</span><strong id="riskout">—</strong></div>
-<div class="metric"><span>Reward/Risk TP1</span><strong id="rr1">—</strong></div>
-<div class="metric"><span>Reward/Risk TP2</span><strong id="rr2">—</strong></div>
-<div class="metric"><span>Reward/Risk TP3</span><strong id="rr3">—</strong></div>
-</div>
-<p id="calcmessage" class="small">Enter entry, stop loss and take-profit prices.</p>
-<button class="secondary" onclick="saveTrade()">Save trade to journal</button>
-</div>
+<section class="card">
+  <h2>7. BOS, CHoCH, retest and confirmation checklist</h2>
+  <div id="structureGrid" class="grid"><div class="tile">Waiting for screenshots.</div></div>
+  <p id="checklistText" class="hint"></p>
+</section>
 
-<div class="card">
-<h2>7. Trade journal</h2>
-<p class="small">Saved in this browser on this device.</p>
-<div style="overflow-x:auto">
-<table><thead><tr><th>Date</th><th>Side</th><th>Entry</th><th>SL</th><th>TP1</th><th>Lot</th><th>Score</th></tr></thead><tbody id="history"></tbody></table>
-</div>
-<br>
-<button class="secondary" onclick="exportCSV()">Export CSV</button>
-<button class="danger" onclick="clearHistory()">Clear history</button>
-</div>
 
+<section class="card">
+  <h2>8. Automatic support &amp; resistance zone map</h2>
+  <p class="hint">Zones are estimated from visible swing points, repeated reactions and break/retest evidence in your screenshots. They are not live levels. Green = support; red = resistance; yellow marker = screenshot current price when readable.</p>
+  <div class="zone-legend"><span><i class="zone-dot" style="background:#28c58b"></i>Support zone</span><span><i class="zone-dot" style="background:#f16b72"></i>Resistance zone</span><span><i class="zone-dot" style="background:#ffd166"></i>Screenshot price</span></div>
+  <div id="zoneConfluence" class="status">Multi-timeframe zone confluence appears after analysis.</div>
+  <div id="zoneMap" class="zone-layout" style="margin-top:12px"><div class="tile">Automatic zones appear after analysis.</div></div>
+</section>
+
+<section class="card">
+  <h2>9. Main multi-timeframe trading assessment</h2>
+  <div id="assessmentGrid" class="grid"><div class="tile">No assessment yet.</div></div>
+  <p class="small">Confluence score is not a win probability and cannot guarantee a profitable trade.</p>
+  <div id="explanation" class="status">AI explanation appears here.</div>
+</section>
+
+<section class="card">
+  <h2>10. What to do next — one clear screenshot instruction</h2>
+  <div id="nextScreenshotCard" class="status" style="margin-bottom:12px">The dashboard will choose ONE next timeframe after analysis.</div>
+  <button id="uploadNextTfBtn" class="secondary" disabled>Choose recommended timeframe screenshot</button>
+  <div id="nextActionGrid" class="grid"><div class="tile">Next-step guidance appears after analysis.</div></div>
+  <div id="timeframeGuide" class="status" style="margin-top:10px">Upload guidance appears after analysis.</div>
+</section>
+
+<section class="card">
+  <h2>11. Main trade entry plan and small-account risk check</h2>
+  <p class="hint">This is the MAIN setup derived from H1 → M30 → M15 → M5 alignment. It is separate from the independent quick next-candle assessment below.</p>
+  <p class="hint">Reference balance: USD25. Intended lot size: 0.01. Approximate EUR/USD value is USD0.10 per pip at 0.01 lot; verify your FXGT contract specifications and account currency.</p>
+  <div id="mainTradePlan" class="grid"><div class="tile">No main trade plan yet.</div></div>
+  <div id="mainRiskBox" class="status">Risk estimate appears when a complete main entry and stop loss are available.</div>
+</section>
+
+<section class="card">
+  <h2>12. Screenshot refresh advice</h2>
+  <div id="refreshAdvice" class="status">Refresh advice appears after analysis.</div>
+  <p class="small">This dashboard does not monitor live prices while idle. Analysis runs only when you press a button.</p>
+</section>
+
+
+
+<section class="card">
+  <h2>13. Full AI response and diagnostics</h2>
+  <pre id="rawResponse" class="json">No response yet.</pre>
+</section>
+
+<section class="card">
+  <h2>14. Independent quick trade entry — next candle + demo journal</h2>
+  <p class="hint">Separate short-term assessment using the existing M5 screenshot only. Crosshair alignment is disabled; the Worker reads the visible OHLC header without requiring crosshair positioning. It performs a dedicated second M5 image-reading pass and reconciles it with first-pass M5 readings; no extra upload is needed. It must not copy the main multi-timeframe conclusion. When a valid setup is supported, provide Entry, SL, TP1 and risk/reward. If price levels cannot be read or the setup is unclear, return WAIT — PRICE DATA INSUFFICIENT rather than inventing prices.</p>
+  <div id="quickTradePlan" class="grid"><div class="tile">Independent quick assessment appears after analysis.</div></div>
+  <h3>Demo trade result tracker</h3>
+  <p class="hint">Record a demo entry only after you execute it yourself. Mark Successful if any TP is reached, or Failed if SL is hit. No automatic FXGT monitoring.</p>
+  <div class="actions"><button id="recordDemoTrade" type="button" disabled>Record quick demo entry</button><button id="markTradeSuccess" class="secondary" type="button" disabled>Mark Successful (TP reached)</button><button id="markTradeFailed" class="warn" type="button" disabled>Mark Failed (SL hit)</button></div>
+  <div id="demoTradeStatus" class="status">No demo trade recorded.</div>
+  <div id="demoTradeHistory" class="status">Trade history will appear here.</div>
+</section>
+
+<footer class="small">Analysis support only. No trade execution or guaranteed results. Verify prices, spread, news, margin and risk yourself.</footer>
 </main>
-<footer>EUR/USD Smart Trading Dashboard · Educational decision-support tool · Not financial advice</footer>
 
 <script>
-const $=id=>document.getElementById(id);
-let lastScore=0,lastDirection="—",lastLot=0,lastRisk=0,lastRR=["—","—","—"];
-function preview(input,id){
- const file=input.files[0];if(!file)return;
- const img=$(id);img.src=URL.createObjectURL(file);img.hidden=false;
+const $ = id => document.getElementById(id);
+const ORDER = ["H1","M30","M15","M5"];
+let filesByTf = {};
+let latest = null;
+let recommendedNextTf = "";
+let objectUrls = {};
+let demoTradeHistory = JSON.parse(localStorage.getItem("eurusd_demo_trade_history") || "[]");
+let activeDemoTrade = demoTradeHistory.slice().reverse().find(t=>t.status==="Entered") || null;
+
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
 }
-function val(id){return parseFloat($(id).value)}
-function analyse(){
- let score=0,notes=[];
- const h1=$("h1trend").value,m30=$("m30trend").value,bos=$("bos").value,trig=$("trigger").value;
- let dir=(h1==="Bullish"||h1==="Bearish")?h1:"";
- if(!dir){$("explanation").textContent="Select a clear H1 direction first.";return}
- if(m30===dir)score+=20;else notes.push("M30 does not align with H1");
- score+=25;
- if(bos==="Confirmed "+dir.toLowerCase()+" BOS")score+=20;else notes.push("No matching confirmed M15 BOS");
- if($("retest").checked)score+=15;else notes.push("Retest not confirmed");
- if(trig.toLowerCase().startsWith(dir.toLowerCase()))score+=10;else notes.push("M5 trigger does not match direction");
- if($("spreadok").checked)score+=5;else notes.push("Spread not confirmed acceptable");
- const rsi=val("m15rsi");
- if(Number.isFinite(rsi)&&rsi>=35&&rsi<=65)score+=5;else notes.push("M15 RSI is missing or outside 35–65");
- if(!$("news").checked)notes.push("Major news not checked");
- if(!$("candle").checked)notes.push("Confirmation candle not checked");
- if(!$("level").checked)notes.push("Support/resistance location not checked");
- lastScore=score;lastDirection=dir;
- $("score").textContent=score+"/100";
- $("direction").textContent=dir;
- const pass=score>=80&&m30===dir&&bos==="Confirmed "+dir.toLowerCase()+" BOS"&&$("retest").checked&&trig.toLowerCase().startsWith(dir.toLowerCase())&&$("news").checked&&$("spreadok").checked;
- $("decision").textContent=pass?"SETUP PASSES CHECKS":"NO TRADE";
- $("decision").className=pass?"good":"warn";
- $("explanation").textContent=notes.length?notes.join(" · "):"All selected checks passed. Verify the chart and risk before trading.";
- $("side").value=dir==="Bullish"?"BUY":"SELL";
+function localDateTime(date=new Date()) {
+  return new Intl.DateTimeFormat("en-MY",{
+    timeZone:"Asia/Kuala_Lumpur",year:"numeric",month:"2-digit",
+    day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",
+    hour12:true
+  }).format(date);
 }
-function calculate(){
- const side=$("side").value,e=val("entry"),s=val("sl"),risk=val("risk");
- if(![e,s,risk].every(Number.isFinite)||risk<=0){$("calcmessage").textContent="Enter a valid entry, stop loss and risk amount.";return false}
- const dist=Math.abs(e-s),pips=dist*10000;
- const valid=side==="BUY"?s<e:s>e;
- if(!valid||dist===0){$("calcmessage").textContent="Invalid stop loss. BUY requires SL below entry; SELL requires SL above entry.";return false}
- const rawLot=risk/(pips*10),lot=Math.floor(rawLot*100)/100;
- const actualRisk=lot*pips*10;
- $("distance").textContent=pips.toFixed(1)+" pips";
- $("lot").textContent=lot.toFixed(2);
- $("riskout").textContent="$"+actualRisk.toFixed(2);
- lastLot=lot;lastRisk=actualRisk;
- const tps=["tp1","tp2","tp3"];
- lastRR=tps.map(id=>{
- const tp=val(id);if(!Number.isFinite(tp))return "—";
- const reward=side==="BUY"?(tp-e):(e-tp);
- return reward>0?(reward/dist).toFixed(2)+"R":"Invalid";
- });
- ["rr1","rr2","rr3"].forEach((id,i)=>$(id).textContent=lastRR[i]);
- $("calcmessage").textContent=lot<0.01?"Calculated lot is below 0.01. If your broker minimum is 0.01, do not increase it automatically; reduce risk or skip the trade.":"Estimate assumes EUR/USD pip value of $10 per 1.00 standard lot. Confirm your broker's contract size and minimum lot.";
- return true;
+function updateClock() {
+  $("localClock").textContent="Malaysia date and time: "+localDateTime();
 }
-function getHistory(){try{return JSON.parse(localStorage.getItem("eurusdJournal")||"[]")}catch(e){return []}}
-function saveTrade(){
- if(!calculate())return;
- const e=val("entry"),s=val("sl"),t=val("tp1");
- const item={date:new Date().toLocaleString(),side:$("side").value,entry:e,sl:s,tp1:Number.isFinite(t)?t:"",lot:lastLot.toFixed(2),score:lastScore};
- const h=getHistory();h.unshift(item);localStorage.setItem("eurusdJournal",JSON.stringify(h));renderHistory();
- $("calcmessage").textContent="Trade plan saved in this browser.";
+updateClock();
+setInterval(updateClock,1000);
+
+function setStatus(message,cls="") {
+  $("status").textContent=message;
+  $("status").className="status "+cls;
 }
-function renderHistory(){
- $("history").innerHTML=getHistory().map(x=>`<tr><td>${x.date}</td><td>${x.side}</td><td>${x.entry}</td><td>${x.sl}</td><td>${x.tp1}</td><td>${x.lot}</td><td>${x.score}</td></tr>`).join("");
+function loadSettings() {
+  $("workerUrl").value=localStorage.getItem("eurusd_worker_url")||"";
+  $("dashboardToken").value=sessionStorage.getItem("eurusd_dashboard_token")||"";
+  $("connectionState").textContent=$("workerUrl").value?"Worker URL saved":"Needs setup";
 }
-function exportCSV(){
- const h=getHistory();if(!h.length){alert("No trades saved yet.");return}
- const rows=[["Date","Side","Entry","SL","TP1","Lot","Score"],...h.map(x=>[x.date,x.side,x.entry,x.sl,x.tp1,x.lot,x.score])];
- const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
- const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="eurusd-trade-journal.csv";a.click();URL.revokeObjectURL(a.href);
+loadSettings();
+
+$("saveSettings").onclick=()=>{
+  const url=$("workerUrl").value.trim().replace(/\/+$/,"");
+  const token=$("dashboardToken").value.trim();
+  if(!url.startsWith("https://")||!token) {
+    $("connectionState").textContent="Enter a valid HTTPS URL and access token";
+    return;
+  }
+  localStorage.setItem("eurusd_worker_url",url);
+  sessionStorage.setItem("eurusd_dashboard_token",token);
+  $("connectionState").textContent="Connection settings saved";
+};
+
+function tile(label,content) {
+  return `<div class="tile"><span class="small">${esc(label)}</span><b>${esc(content)}</b></div>`;
 }
-function clearHistory(){if(confirm("Delete all saved trades from this browser?")){localStorage.removeItem("eurusdJournal");renderHistory()}}
-function updatePrices(){
- const b=val("bid"),a=val("ask"),r=val("risk"),bal=val("balance");
- $("spread").textContent=Number.isFinite(a)&&Number.isFinite(b)&&a>=b?((a-b)*10000).toFixed(1)+" pips":"—";
- $("riskpct").textContent=Number.isFinite(r)&&Number.isFinite(bal)&&bal>0?(r/bal*100).toFixed(2)+"%":"—";
+function metric(label,val) {
+  const n = (typeof val === "number" || (typeof val === "string" && val.trim() !== "")) ? Number(val) : NaN;
+  const priceLike = /^EMA|^Open$|^High$|^Low$|^Close$|^Entry$|^Stop loss$|^TP/i.test(label);
+  const display = Number.isFinite(n) && priceLike ? n.toFixed(5) : show(val);
+  return `<div class="metric">${esc(label)}<strong>${esc(display)}</strong></div>`;
 }
-["bid","ask","risk","balance"].forEach(id=>$(id).addEventListener("input",updatePrices));
-renderHistory();updatePrices();
- 
-// AI CONNECTION TEST
-const AI_WORKER_URL = "https://eurusd-ai-worker.velzonventures.workers.dev/analyze";
- 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+function show(v) {
+  if(v===null||v===undefined||v===""||v==="string") return "Not readable";
+  if(typeof v==="object") return JSON.stringify(v);
+  return String(v);
+}
+function showCandle(c={}) {
+  return `<div class="subgrid">
+    ${metric("Open",c.open)}${metric("High",c.high)}
+    ${metric("Low",c.low)}${metric("Close",c.close)}
+    ${metric("Candle status",c.status)}
+  </div>`;
+}
+function showMacd(m={}) {
+  m=m||{};
+  return `<div class="subgrid">
+    ${metric("MACD histogram",m.histogram)}
+    ${metric("MACD line (blue)",m.macdLine)}
+    ${metric("Signal line (orange)",m.signalLine)}
+  </div>`;
+}
+function updateCaptureGrid() {
+  $("captureGrid").innerHTML=ORDER.map(tf=>{
+    const item=filesByTf[tf];
+    if(!item) return tile(tf,"No detailed close-up stored");
+    return `<div class="tile"><b>${tf}</b>
+      <p>File: ${esc(item.file.name)}</p>
+      <p>Size: ${(item.file.size/1024).toFixed(1)} KB</p>
+      <p>Uploaded: ${esc(item.uploadedAt)}</p>
+      <p class="good">Stored and ready</p></div>`;
+  }).join("");
+}
+function clearResults() {
+  ["currentGrid","indicatorGrid","advancedStructureGrid","structureGrid","zoneMap","assessmentGrid","mainTradePlan","quickTradePlan","nextActionGrid"].forEach(id=>{
+    $(id).innerHTML='<div class="tile">Waiting for new analysis.</div>';
   });
+  $("priceAudit").textContent="Price consistency check appears after analysis.";
+  $("zoneConfluence").textContent="Multi-timeframe zone confluence appears after analysis.";
+  $("timeframeGuide").textContent="Upload guidance appears after analysis.";
+  $("nextScreenshotCard").textContent="The dashboard will choose ONE next timeframe after analysis.";
+  $("uploadNextTfBtn").disabled=true;$("uploadNextTfBtn").textContent="Choose recommended timeframe screenshot";recommendedNextTf="";
+  $("checklistText").textContent="";
+  $("explanation").textContent="Waiting for a new analysis.";
+  $("mainRiskBox").textContent="Risk estimate appears when entry and stop loss are available.";
+  $("refreshAdvice").textContent="Waiting for new analysis.";
+  $("recordDemoTrade").disabled=true;
+  $("markTradeSuccess").disabled=true;
+  $("markTradeFailed").disabled=true;
+  $("demoTradeStatus").textContent="No demo trade recorded.";
 }
-
-async function prepareChartImage(inputId, timeframe) {
-  const input = document.getElementById(inputId);
-  const file = input?.files?.[0];
-
-  if (!file) return null;
-
-  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-    throw new Error(timeframe + " must be PNG, JPG or WebP.");
-  }
-
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 1400 / bitmap.width);
-  const canvas = document.createElement("canvas");
-
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-
-  const blob = await new Promise(resolve =>
-    canvas.toBlob(resolve, "image/jpeg", 0.82)
-  );
-
-  if (!blob) throw new Error("Could not prepare " + timeframe + " screenshot.");
-
-  return {
-    timeframe,
-    mimeType: "image/jpeg",
-    data: await fileToBase64(blob)
-  };
+function clearTimeframe(tf) {
+  delete filesByTf[tf];
+  const input=document.querySelector(`input[type=file][data-tf="${tf}"]`);
+  input.value="";
+  if(objectUrls[tf]) URL.revokeObjectURL(objectUrls[tf]);
+  delete objectUrls[tf];
+  const preview=$("preview-"+tf);
+  preview.removeAttribute("src");
+  preview.style.display="none";
+  $("time-"+tf).textContent="No detailed close-up uploaded";
+  latest=null;
+  $("rawResponse").textContent="Screenshot changed. Run a new analysis.";
+  updateCaptureGrid();
+  clearResults();
 }
-
-async function preparePreviewImage(previewId, timeframe) {
-  const img = document.getElementById(previewId);
-
-  if (!img || !img.src || img.hidden || img.naturalWidth === 0) {
-    return null;
-  }
-
-  const response = await fetch(img.src);
-  const blob = await response.blob();
-  const bitmap = await createImageBitmap(blob);
-  const scale = Math.min(1, 1400 / bitmap.width);
-  const canvas = document.createElement("canvas");
-
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-
-  const jpeg = await new Promise(resolve =>
-    canvas.toBlob(resolve, "image/jpeg", 0.82)
-  );
-
-  return {
-    timeframe,
-    mimeType: "image/jpeg",
-    data: await fileToBase64(jpeg)
-  };
-}
-
-const aiCard = document.createElement("div");
-aiCard.className = "card";
-aiCard.innerHTML = `
-  <h2>AI Chart Analysis</h2>
-  <p class="small">Analyse your uploaded H1, M30, M15 and M5 charts with Gemini.</p>
-  <button type="button" id="runGemini">Analyse screenshots with AI</button>
-  <p id="geminiStatus" class="small">Ready when your screenshots are uploaded.</p>
-  <pre id="geminiResult" style="white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6"></pre>
-`;
-
-document.getElementById("p4").closest(".card").after(aiCard);
-
-document.getElementById("runGemini").addEventListener("click", async () => {
-  const button = document.getElementById("runGemini");
-  const status = document.getElementById("geminiStatus");
-  const output = document.getElementById("geminiResult");
-
-  button.disabled = true;
-  status.textContent = "Preparing chart screenshots...";
-  output.textContent = "";
-
-  try {
-    const images = [];
-
-    for (const [id, timeframe] of [
-      ["p1", "H1"],
-      ["p2", "M30"],
-      ["p3", "M15"],
-      ["p4", "M5"]
-    ]) {
-      const image = await preparePreviewImage(id, timeframe);
-      if (image) images.push(image);
+document.querySelectorAll('input[type=file][data-tf]').forEach(input=>{
+  input.addEventListener("change",()=>{
+    const file=input.files[0],tf=input.dataset.tf;
+    if(!file)return;
+    if(!["image/png","image/jpeg","image/webp"].includes(file.type)){
+      setStatus("Choose PNG, JPEG or WebP.","bad");input.value="";return;
     }
-
-    if (!images.length) {
-      throw new Error("Please upload at least one chart screenshot.");
+    if(file.size>12*1024*1024){
+      setStatus("Screenshot is too large. Please use a smaller image.","bad");input.value="";return;
     }
-
-    status.textContent = "Sending " + images.length + " chart(s) to Gemini...";
-
-    const response = await fetch(AI_WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ images })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || "Gemini analysis failed.");
-    }
-
-    status.textContent = "Analysis completed using " + data.model;
-    output.textContent = data.analysis;
-
-  } catch (error) {
-    status.textContent = "Analysis failed.";
-    output.textContent = error.message;
-  } finally {
-    button.disabled = false;
-  }
+    const hadPreviousScreenshot = Object.prototype.hasOwnProperty.call(filesByTf,tf);
+    if(objectUrls[tf])URL.revokeObjectURL(objectUrls[tf]);
+    const uploaded=new Date();
+    filesByTf[tf]={
+      file,uploadedAt:localDateTime(uploaded),uploadedISO:uploaded.toISOString(),
+      fileName:file.name,fileSize:file.size,lastModified:file.lastModified
+    };
+    const preview=$("preview-"+tf),u=URL.createObjectURL(file);
+    objectUrls[tf]=u;preview.src=u;preview.style.display="block";
+    $("time-"+tf).textContent="Uploaded: "+localDateTime(uploaded);
+    latest=null;clearResults();
+    const uploadAction = hadPreviousScreenshot ? "replaced" : "uploaded";
+    $("rawResponse").textContent = tf + " screenshot " + uploadAction + ". Run a new analysis.";
+    updateCaptureGrid();
+    setStatus(tf + " screenshot " + uploadAction + ". " + ORDER.filter(k=>filesByTf[k]).length + "/4 required close-ups ready" + ".", "good");
+  });
 });
+document.querySelectorAll(".clear-one").forEach(b=>b.onclick=()=>clearTimeframe(b.dataset.clear));
 
 
+async function encodeImage(file) {
+  const data=await new Promise((resolve,reject)=>{
+    const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);
+  });
+  const img=await new Promise((resolve,reject)=>{
+    const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=data;
+  });
+  const scale=Math.min(1,1800/Math.max(img.width,img.height));
+  const canvas=document.createElement("canvas");
+  canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+  const ctx=canvas.getContext("2d");
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  const cropData=(sx,sw)=>{
+    const sourceWidth=Math.max(1,Math.min(sw,canvas.width-sx));
+    const upscale=1.35;
+    const crop=document.createElement("canvas");
+    crop.width=Math.round(sourceWidth*upscale);crop.height=Math.round(canvas.height*upscale);
+    crop.getContext("2d").drawImage(canvas,sx,0,sourceWidth,canvas.height,0,0,crop.width,crop.height);
+    return crop.toDataURL("image/jpeg",0.94);
+  };
+  const legendWidth=Math.round(canvas.width*0.27);
+  const rightStart=Math.round(canvas.width*0.83);
+  return {
+    mimeType:"image/jpeg",
+    data:canvas.toDataURL("image/jpeg",0.93),
+    legendData:cropData(0,legendWidth),
+    rightScaleData:cropData(rightStart,canvas.width-rightStart)
+  };
+}
+
+function numberValue(v) {
+  if(typeof v==="number"&&Number.isFinite(v))return v;
+  if(typeof v==="string"&&v.trim()!=="") {
+    const n=Number(v.replace(/,/g,""));if(Number.isFinite(n))return n;
+  }
+  return null;
+}
+
+function renderZoneMap(tfData, confluence, singleCurrentPrice) {
+  const zoneConfluence = confluence || {};
+  const ns = zoneConfluence.nearestSupport || {};
+  const nr = zoneConfluence.nearestResistance || {};
+  const zoneSummary = `Nearest support: ${show(ns.lower)} – ${show(ns.upper)} (mid ${show(ns.midpoint)}), ${show(ns.strength)}; timeframes: ${(ns.timeframes||[]).join(", ") || "Not supplied"}.\nNearest resistance: ${show(nr.lower)} – ${show(nr.upper)} (mid ${show(nr.midpoint)}), ${show(nr.strength)}; timeframes: ${(nr.timeframes||[]).join(", ") || "Not supplied"}.\nOverlap: ${show(zoneConfluence.overlappingZones)}\n${show(zoneConfluence.explanation)}`;
+  $("zoneConfluence").textContent = zoneSummary;
+
+  $("zoneMap").innerHTML = ORDER.map(tf => {
+    const x = tfData[tf] || {};
+    const supports = Array.isArray(x.supportZones) ? x.supportZones : [];
+    const resistances = Array.isArray(x.resistanceZones) ? x.resistanceZones : [];
+    const cp = numberValue(singleCurrentPrice);
+    const vals = [cp];
+    [...supports, ...resistances].forEach(z => {
+      const lo = numberValue(z.lower), hi = numberValue(z.upper);
+      if (lo !== null) vals.push(lo);
+      if (hi !== null) vals.push(hi);
+    });
+    const usable = vals.filter(v => v !== null && Number.isFinite(v));
+    let min = usable.length ? Math.min(...usable) : null;
+    let max = usable.length ? Math.max(...usable) : null;
+    if (min !== null && max === min) { min -= 0.0005; max += 0.0005; }
+    const pos = v => min === null || max === null || numberValue(v) === null ? null : Math.max(0,Math.min(100,(numberValue(v)-min)/(max-min)*100));
+    const band = (z, kind) => {
+      const lo=numberValue(z.lower), hi=numberValue(z.upper);
+      if(lo===null || hi===null || min===null || max===null) return '';
+      const left=pos(Math.min(lo,hi)), right=pos(Math.max(lo,hi));
+      return `<div class="zone-band ${kind}" style="left:${left}%;width:${Math.max(1,right-left)}%" title="${esc(kind)} ${esc(lo)}–${esc(hi)}"></div>`;
+    };
+    const rows = (items, kind) => items.length ? items.map((z,i)=>{
+      const lo=show(z.lower), hi=show(z.upper), mid=show(z.midpoint);
+      return `<div class="zone-row ${kind}"><b>${kind==='support'?'Support':'Resistance'} ${i+1}: ${esc(lo)} – ${esc(hi)}</b>
+        <div class="zone-meta">Midpoint: ${esc(mid)} · Strength: ${esc(show(z.strength))} · Reactions: ${esc(show(z.reactionCount))}<br>Status: ${esc(show(z.status))}<br>${esc(show(z.evidence))}</div></div>`;
+    }).join('') : `<div class="zone-row">No reliable ${kind} zone returned.</div>`;
+    const currentMarker = pos(cp);
+    return `<div class="zone-card"><b>${tf} — price zones</b>
+      <div class="zone-meta">Trend: ${esc(show(x.trend))} · Single price reference shown above</div>
+      <div class="zone-track">${supports.map(z=>band(z,'support')).join('')}${resistances.map(z=>band(z,'resistance')).join('')}${currentMarker===null?'':`<div class="zone-band current" style="left:${currentMarker}%" title="Screenshot price"></div>`}</div>
+      <div class="zone-scale"><span>${min===null?'Scale unavailable':min.toFixed(5)}</span><span>${max===null?'':max.toFixed(5)}</span></div>
+      <h3>Support zones</h3><div class="zone-list">${rows(supports,'support')}</div>
+      <h3>Resistance zones</h3><div class="zone-list">${rows(resistances,'resistance')}</div>
+      <div class="zone-meta">${esc(show(x.notes))}</div></div>`;
+  }).join('');
+}
+
+function render(data) {
+  // Current Worker response envelope: { success:true, analysis:{...} }
+  const d = (data.analysis && typeof data.analysis === "object")
+    ? data.analysis
+    : (data.structured || data.structured_data || null);
+
+  latest = d;
+  $("rawResponse").textContent = d
+    ? JSON.stringify(d, null, 2)
+    : JSON.stringify(data, null, 2);
+
+  if (!d || !d.timeframes) {
+    $("assessmentGrid").innerHTML = tile("Decision", "NO TRADE");
+    $("explanation").textContent =
+      "The Worker responded, but no valid timeframe analysis was found. Do not trade from this response.";
+    $("priceAudit").textContent = "No valid price audit was returned.";
+    $("nextActionGrid").innerHTML = tile("Next action", "Review the full AI response below; do not trade.");
+    $("timeframeGuide").textContent = "No timeframe guidance was returned.";
+    return false;
+  }
+
+  const tfData = d.timeframes;
+  const uploadMap = Object.fromEntries((data.uploadMetadata || []).map(x=>[x.timeframe,x]));
+  const asText = v => {
+    if (v === null || v === undefined || v === "") return "Not readable";
+    if (typeof v === "object") return JSON.stringify(v);
+    return String(v);
+  };
+  const fmtPrice = v => v === null || v === undefined || !Number.isFinite(Number(v)) ? "Not readable" : Number(v).toFixed(5);
+  const priceAudit = d.priceAudit || {};
+
+  const marketPrice = d.marketPrice || {};
+  const singlePrice = marketPrice.value ?? d.priceAudit?.referencePrice ?? null;
+  $("currentGrid").innerHTML =
+    `<div class="tile"><b>EUR/USD — Current price reference</b>
+      <div class="price-label">Bright red numeric marker at the far right</div>
+      <div class="price">${esc(fmtPrice(singlePrice))}</div>
+      <p class="section-note">Source timeframe: ${esc(asText(marketPrice.sourceTimeframe))}</p>
+      <p class="section-note">Source: ${esc(asText(marketPrice.sourceNote || "Screenshot red marker; not a live quote."))}</p>
+      <p class="section-note">Uploaded: ${esc(asText(marketPrice.uploadedAtMalaysia))}</p></div>` +
+    ORDER.map(tf => {
+      const x = tfData[tf] || {};
+      const c = x.latestCandle || {};
+      const candidate = x.ohlcCandidate || null;
+      const candidateHtml = candidate ? `<div class="section-note" style="margin-top:8px;padding:8px;border:1px dashed #d6a84f;border-radius:8px"><b>Recognised OHLC candidate — UNVERIFIED</b><br>O ${esc(fmtPrice(candidate.open))} · H ${esc(fmtPrice(candidate.high))} · L ${esc(fmtPrice(candidate.low))} · C ${esc(fmtPrice(candidate.close))}<br><span>${esc(asText(candidate.source))}</span></div>` : "";
+      const audit = x.fieldAudit || {};
+      const headerReadback = x.headerReadback || {};
+      const auditStatus = audit.ohlcInternallyConsistent ? "OHLC internally consistent — latest-bar association NOT independently confirmed" : (audit.recognisedOhlcCandidate ? "Recognised but unverified / consistency failed" : "Not readable");
+      const auditHtml = `<p class="section-note">OHLC status: ${esc(auditStatus)}</p>
+        <p class="section-note">Model header readback: ${esc(asText(headerReadback.status))} · Confidence: ${esc(asText(headerReadback.confidence))}</p>
+        <p class="section-note">${esc(asText(audit.note || headerReadback.reason))}</p>`;
+      return `<div class="tile"><b>${tf} — Latest candle</b>
+        ${showCandle(c)}${candidateHtml}${auditHtml}
+        <p class="section-note">Upload: ${esc(asText(x.uploadedAtMalaysia || uploadMap[tf]?.uploadedAtMalaysia))}</p>
+        <p class="section-note">${esc(asText(x.notes))}</p></div>`;
+    }).join("");
+
+  $("priceAudit").innerHTML = `<b>Single EUR/USD screenshot price reference</b><br>
+    Current price: ${singlePrice===null || singlePrice===undefined ? "Not readable" : esc(Number(singlePrice).toFixed(5))}<br>
+    Source timeframe: ${esc(asText(marketPrice.sourceTimeframe))}<br>
+    Source upload: ${esc(asText(marketPrice.uploadedAtMalaysia))}<br>
+    <b>${singlePrice===null || singlePrice===undefined ? "Warning: bright red right-edge marker could not be read. Do not substitute another chart label." : "Price marker captured from one screenshot only; other timeframe prices are not compared."}</b>
+    <p class="small">This is a screenshot reading, not a live broker quote. The close-up reading takes priority when its bright red marker is clearly visible; otherwise the full chart reading is used. EUR/USD price fields are displayed to five decimal places; unreadable digits remain Not readable rather than being guessed.</p>`;
+
+  $("indicatorGrid").innerHTML = ORDER.map(tf => {
+    const x = tfData[tf] || {};
+    const i = x.currentIndicators || {};
+    return `<div class="tile"><b>${tf} — Latest indicators</b>
+      <div class="subgrid">
+      ${metric("EMA20", i.ema20)}${metric("EMA50", i.ema50)}
+      ${metric("EMA200", i.ema200)}${metric("RSI14", i.rsi14)}
+      ${metric("ATR14", i.atr14)}${metric("ADX14", i.adx14)}
+      </div><p class="section-note">MACD</p>${showMacd(i.macd)}
+      <div class="section-note"><b>Data quality: ${esc(asText(x.indicatorAudit?.quality || "provisional"))}</b><br>
+      MACD check: ${esc(asText(x.indicatorAudit?.macdConsistency || "not checked"))}${x.indicatorAudit?.macdDifference==null?"":` · difference ${esc(Number(x.indicatorAudit.macdDifference).toFixed(5))}`}<br>
+      Duplicate EMA values: ${x.indicatorAudit?.duplicateEmaValues?"Yes — review labels":"No duplicate detected"}<br>
+      Label/value conflicts: ${(x.indicatorAudit?.labelPairMismatches||[]).length ? esc((x.indicatorAudit.labelPairMismatches||[]).map(v=>v.field).join(", ")) : "None detected / evidence not supplied"}<br>
+      ATR range check: ${x.indicatorAudit?.atrSuspiciousForTimeframe?"Flagged for review":"No extreme-value flag"}<br>
+      EMA label evidence: ${esc(asText(x.indicatorAudit?.labelEvidence?.ema20 || "Not supplied"))} · ${esc(asText(x.indicatorAudit?.labelEvidence?.ema50 || "Not supplied"))} · ${esc(asText(x.indicatorAudit?.labelEvidence?.ema200 || "Not supplied"))}<br>
+      MACD label evidence: ${esc(asText(x.indicatorAudit?.labelEvidence?.macdHistogram || "Not supplied"))} · ${esc(asText(x.indicatorAudit?.labelEvidence?.macdLine || "Not supplied"))} · ${esc(asText(x.indicatorAudit?.labelEvidence?.macdSignal || "Not supplied"))}<br>
+      ${esc(asText(x.indicatorAudit?.note || "Values are provisional visual extractions; verify on chart."))}</div></div>`;
+  }).join("");
+
+  $("advancedStructureGrid").innerHTML = ORDER.map(tf => {
+    const x=tfData[tf]||{}, a=x.advancedStructure||{};
+    return `<div class="tile"><b>${tf} — Advanced structure</b>
+      <p><b>Swing sequence:</b> ${esc(show(a.swingSequence))}</p>
+      <p><b>Liquidity pools:</b> ${esc(show(a.liquidityPools))}</p>
+      <p><b>Liquidity sweep:</b> ${esc(show(a.liquiditySweep))}</p>
+      <p><b>Order block:</b> ${esc(show(a.orderBlock))}</p>
+      <p><b>Fair-value gap:</b> ${esc(show(a.fairValueGap))}</p>
+      <p><b>Premium / discount:</b> ${esc(show(a.premiumDiscount))}</p>
+      <p><b>Major swing high:</b> ${esc(show(a.majorSwingHigh))} · <b>Low:</b> ${esc(show(a.majorSwingLow))}</p>
+      <p><b>Structure invalidation:</b> ${esc(show(a.invalidation))}</p>
+    </div>`;
+  }).join("");
+
+  $("structureGrid").innerHTML = ORDER.map(tf => {
+    const x = tfData[tf] || {}, e=x.structureEvidence||{};
+    return `<div class="tile"><b>${tf} — Structure</b>
+      <p>BOS: ${esc(asText(x.bos))}</p>
+      <p>CHoCH: ${esc(asText(x.choch))}</p>
+      <p>Retest: ${esc(asText(x.retest))}</p>
+      <div class="section-note"><b>Evidence audit</b><br>
+      Prior trend: ${esc(asText(e.priorTrend))}<br>
+      Prior swing high / low: ${esc(e.priorSwingHigh==null?"Not readable":Number(e.priorSwingHigh).toFixed(5))} / ${esc(e.priorSwingLow==null?"Not readable":Number(e.priorSwingLow).toFixed(5))}<br>
+      Break: ${esc(asText(e.breakDirection))} · ${esc(asText(e.breakType))} · level ${esc(e.breakoutLevel==null?"Not readable":Number(e.breakoutLevel).toFixed(5))} · close ${esc(e.breakoutCandleClose==null?"Not readable":Number(e.breakoutCandleClose).toFixed(5))}<br>
+      BOS evidence valid: ${e.bosEvidenceValid?"Yes":"No"}<br>
+      CHoCH level / close: ${esc(e.chochOpposingLevel==null?"Not readable":Number(e.chochOpposingLevel).toFixed(5))} / ${esc(e.chochCandleClose==null?"Not readable":Number(e.chochCandleClose).toFixed(5))} · valid: ${e.chochEvidenceValid?"Yes":"No"}<br>
+      Retest level / reaction: ${esc(e.retestLevel==null?"Not readable":Number(e.retestLevel).toFixed(5))} / ${esc(asText(e.retestReaction))} · valid: ${e.retestEvidenceValid?"Yes":"No"}<br>
+      ${esc(asText(e.evidenceNote))}</div>
+      <p>Support: ${esc(asText(x.support))}</p>
+      <p>Resistance: ${esc(asText(x.resistance))}</p>
+      ${tf === "M5" ? `<p>Entry trigger: ${esc(asText(x.trigger))}</p>` : ""}
+      </div>`;
+  }).join("");
+
+  renderZoneMap(tfData, d.zoneConfluence || {});
+
+  const cl = d.checklist || {};
+  $("checklistText").textContent =
+    "Trend alignment: " + asText(cl.trendAlignment) +
+    " • BOS: " + asText(cl.bosConfirmed) +
+    " • Retest: " + asText(cl.retestConfirmed) +
+    " • Entry trigger: " + asText(cl.entryTrigger);
+
+  const a = d.assessment || {};
+  const decision = a.decision || d.overallDecision || "NO TRADE";
+  $("assessmentGrid").innerHTML = [
+    tile("Direction", asText(a.direction || d.overallDecision)),
+    tile("Confluence score", a.score == null ? "Not supplied" : a.score + " / 100"),
+    tile("Decision", asText(decision)),
+    tile("Overall trend", asText(d.overallTrend))
+  ].join("");
+  $("explanation").textContent =
+    a.explanation || d.summary || d.riskWarning || "No explanation supplied.";
+
+  const next = d.nextAction || {};
+  const requestedTf = String(next.refreshTimeframe || "").toUpperCase();
+  recommendedNextTf = ORDER.includes(requestedTf) ? requestedTf : "";
+  const refreshReason = next.refreshReason || next.missingConfirmation || "No specific new-candle condition was returned.";
+  $("nextScreenshotCard").innerHTML = recommendedNextTf
+    ? `<b>NEXT SCREENSHOT TO UPLOAD: ${esc(recommendedNextTf)}</b><br><br><b>Upload only when:</b> ${esc(refreshReason)}<br><br><b>After upload:</b> replace the ${esc(recommendedNextTf)} screenshot only, then press Analyse / re-analyse stored charts. Keep the other three screenshots unchanged unless the dashboard requests them.`
+    : `<b>No valid next timeframe was returned.</b><br>Do not upload a random or unchanged screenshot. Read the missing-confirmation guidance below or rerun after a new market event.`;
+  $("uploadNextTfBtn").disabled = !recommendedNextTf;
+  $("uploadNextTfBtn").textContent = recommendedNextTf ? `Choose new ${recommendedNextTf} screenshot` : "No timeframe selected";
+  $("nextActionGrid").innerHTML = [
+    tile("Recommended next action", asText(next.action || d.refreshAdvice)),
+    tile("Missing confirmation", asText(next.missingConfirmation)),
+    tile("Bullish condition", asText(next.bullishCondition)),
+    tile("Bearish condition", asText(next.bearishCondition)),
+    tile("Invalidation", asText(next.invalidation))
+  ].join("");
+
+  const guide = d.timeframeGuidance || {};
+  $("timeframeGuide").innerHTML = `
+    <b>Other timeframe context (not extra upload requests)</b><br>
+    H1 — ${esc(asText(guide.H1))}<br>
+    M30 — ${esc(asText(guide.M30))}<br>
+    M15 — ${esc(asText(guide.M15))}<br>
+    M5 — ${esc(asText(guide.M5))}`;
+
+  const p = d.tradePlan || {};
+  const scenarios=d.tradeScenarios || {};
+  const scenarioCard=(side,obj)=>{
+    obj=obj||{};const entry=obj.entry,sl=obj.stopLoss,tp1=obj.takeProfit1,tp2=obj.takeProfit2,tp3=obj.takeProfit3;
+    const rr=(tp)=>{const e=numberValue(entry),s=numberValue(sl),t=numberValue(tp);if(e===null||s===null||t===null||Math.abs(e-s)===0)return "Not calculable";return (Math.abs(t-e)/Math.abs(e-s)).toFixed(2)+"R";};
+    return `<div class="tile"><b>${side} — main conditional setup</b>
+      <p>Entry: <strong>${esc(show(entry))}</strong></p><p>Stop loss: <strong>${esc(show(sl))}</strong></p>
+      <p>TP1 (priority): <strong>${esc(show(tp1))}</strong> · R:R ${esc(rr(tp1))}</p>
+      <p>TP2 (optional): <strong>${esc(show(tp2))}</strong> · R:R ${esc(rr(tp2))}</p>
+      <p>TP3 (optional): <strong>${esc(show(tp3))}</strong> · R:R ${esc(rr(tp3))}</p>
+      <p>Entry confirmation: ${esc(show(obj.confirmation))}</p><p>Invalidation: ${esc(show(obj.invalidation))}</p><p>Reason: ${esc(show(obj.reason))}</p></div>`;
+  };
+  $("mainTradePlan").innerHTML = [tile("Main decision",asText(decision)),scenarioCard("BUY",scenarios.buy),scenarioCard("SELL",scenarios.sell)].join("");
+
+  const chosenRiskPlan = (decision==="BUY"?scenarios.buy:decision==="SELL"?scenarios.sell:null) || p;
+  const entry = numberValue(chosenRiskPlan.entry), sl = numberValue(chosenRiskPlan.stopLoss);
+  if (entry === null || sl === null) {
+    $("mainRiskBox").textContent = "No complete, verified main entry/SL pair. Risk cannot be calculated. Do not enter based on missing prices.";
+  } else {
+    const pips=Math.abs(entry-sl)*10000, usd=pips*0.10, percent=usd/25*100;
+    $("mainRiskBox").innerHTML=`Estimated stop distance: <b>${pips.toFixed(1)} pips</b><br>Estimated loss at 0.01 lot: <b>USD ${usd.toFixed(2)}</b> (${percent.toFixed(1)}% of USD25).<br><b class="${usd<=0.5?"good":"bad"}">${usd<=0.5?"Within a 2% reference cap; verify broker calculation.":"Above a 2% reference cap; 0.01 lot may be too risky."}</b><br><span class="small">Approximate only. Spread, slippage, conversion and contract specifications affect actual loss.</span>`;
+  }
+
+  const quick=d.quickTradeAssessment||{};
+  const qe=numberValue(quick.entry), qs=numberValue(quick.stopLoss), qt=numberValue(quick.takeProfit1);
+  const qrr=(qe!==null&&qs!==null&&qt!==null&&Math.abs(qe-qs)>0)?(Math.abs(qt-qe)/Math.abs(qe-qs)).toFixed(2)+"R":"Not calculable";
+  $("quickTradePlan").innerHTML=`<div class="tile"><b>Independent short-term decision</b>
+    <p>Outlook: <strong>${esc(show(quick.nextCandleOutlook))}</strong></p><p>Action: <strong>${esc(show(quick.decision))}</strong></p>
+    <p>Entry: <strong>${esc(show(quick.entry))}</strong></p><p>Stop loss: <strong>${esc(show(quick.stopLoss))}</strong></p>
+    <p>TP1: <strong>${esc(show(quick.takeProfit1))}</strong> · R:R ${esc(qrr)}</p>
+    <p>TP2 (optional): ${esc(show(quick.takeProfit2))} · TP3 (optional): ${esc(show(quick.takeProfit3))}</p>
+    <p>Entry trigger: ${esc(show(quick.entryTrigger))}</p><p>Invalidation: ${esc(show(quick.invalidation))}</p>
+    <p>Why: ${esc(show(quick.reason))}</p><p>Price-data status: ${esc(show(quick.priceDataStatus))}</p></div>`;
+  latest=data.analysis||data;
+
+  $("refreshAdvice").textContent =
+    d.refreshAdvice || next.action || "Review the next-action guidance above. No live monitoring is provided.";
+  return true;
+}
+
+
+function saveDemoHistory(){localStorage.setItem("eurusd_demo_trade_history",JSON.stringify(demoTradeHistory));renderDemoHistory();}
+function renderDemoHistory(){
+  $("demoTradeHistory").innerHTML=demoTradeHistory.length?"<b>Demo trade history</b><br>"+demoTradeHistory.slice().reverse().map(t=>`${esc(t.time)} · ${esc(t.direction)} · Entry ${esc(t.entry??"n/a")} · SL ${esc(t.stopLoss??"n/a")} · TP1 ${esc(t.tp1??"n/a")} · <b>${esc(t.status)}</b>`).join("<br>"):"No completed demo trades yet.";
+  const pending=activeDemoTrade&&activeDemoTrade.status==="Entered";
+  $("markTradeSuccess").disabled=!pending;$("markTradeFailed").disabled=!pending;
+  const quick=(latest||{}).quickTradeAssessment||{};
+  $("recordDemoTrade").disabled=!(["BUY","SELL"].includes(quick.decision) && numberValue(quick.entry)!==null && numberValue(quick.stopLoss)!==null && numberValue(quick.takeProfit1)!==null);
+  $("demoTradeStatus").textContent=activeDemoTrade?`Current demo trade: ${activeDemoTrade.direction} · ${activeDemoTrade.status}. TP1 is the default target. Update the result manually after TP or SL.`:"No demo trade recorded.";
+}
+function currentScenario(){const q=(latest||{}).quickTradeAssessment||{};return ["BUY","SELL"].includes(q.decision)?{direction:q.decision,entry:q.entry,stopLoss:q.stopLoss,takeProfit1:q.takeProfit1,takeProfit2:q.takeProfit2,takeProfit3:q.takeProfit3}:null;}
+$("recordDemoTrade").onclick=()=>{
+  const p=currentScenario();if(!p||numberValue(p.entry)===null||numberValue(p.stopLoss)===null){$("demoTradeStatus").textContent="Cannot record: the independent quick assessment has no complete BUY/SELL entry, SL and TP1. WAIT trades cannot be recorded.";return;}
+  activeDemoTrade={id:Date.now(),time:localDateTime(),direction:p.direction,entry:p.entry,stopLoss:p.stopLoss,tp1:p.takeProfit1,tp2:p.takeProfit2,tp3:p.takeProfit3,status:"Entered",targetPriority:"TP1",note:"Demo account; manually recorded"};
+  demoTradeHistory.push(activeDemoTrade);saveDemoHistory();
+};
+function finishDemoTrade(status){if(!activeDemoTrade||activeDemoTrade.status!=="Entered")return;activeDemoTrade.status=status;activeDemoTrade.closedAt=localDateTime();const idx=demoTradeHistory.findIndex(x=>x.id===activeDemoTrade.id);if(idx>=0)demoTradeHistory[idx]=activeDemoTrade;saveDemoHistory();}
+$("markTradeSuccess").onclick=()=>finishDemoTrade("Successful — TP reached");
+$("markTradeFailed").onclick=()=>finishDemoTrade("Failed — SL hit");
+renderDemoHistory();
+
+function quotaLockUntil() {
+  const n = Number(localStorage.getItem("eurusd_openrouter_quota_reset_ms") || 0);
+  return Number.isFinite(n) ? n : 0;
+}
+function applyQuotaLock() {
+  const until = quotaLockUntil();
+  const locked = until > Date.now();
+  $("analyseBtn").disabled = locked;
+  $("recheckBtn").disabled = locked;
+  if (locked) {
+    const when = new Date(until).toLocaleString("en-MY", { timeZone:"Asia/Kuala_Lumpur" });
+    setStatus("OpenRouter free daily quota is exhausted. Analyse and Check Entry are paused until " + when + " Malaysia time. Your screenshots are retained.", "bad");
+  } else {
+    localStorage.removeItem("eurusd_openrouter_quota_reset_ms");
+  }
+  return locked;
+}
+applyQuotaLock();
+
+async function analyse() {
+  if (applyQuotaLock()) return;
+  const url=localStorage.getItem("eurusd_worker_url");
+  const token=sessionStorage.getItem("eurusd_dashboard_token");
+  if(!url||!token){setStatus("Set Worker URL and dashboard token first.","bad");return;}
+  const missing=ORDER.filter(tf=>!filesByTf[tf]);
+  if(missing.length){setStatus("Missing detailed close-ups: "+missing.join(", ")+". All four are required.","bad");return;}
+
+  $("analyseBtn").disabled=true;$("recheckBtn").disabled=true;
+  latest=null;clearResults();$("rawResponse").textContent="Waiting for AI response...";
+  setStatus("Preparing four detailed close-ups. The Worker will analyse H1, M30, M15 and M5, then perform a separate quick-trade read using the same M5 image...");
+  try {
+    const images=[];
+    for(const tf of ORDER) {
+      const s=filesByTf[tf],encoded=await encodeImage(s.file);
+      images.push({
+        timeframe:tf,mimeType:encoded.mimeType,data:encoded.data,
+        legendData:encoded.legendData,rightScaleData:encoded.rightScaleData,
+        uploadedAt:s.uploadedISO,uploadedAtMalaysia:s.uploadedAt,
+        fileName:s.fileName,fileSize:s.fileSize,lastModified:s.lastModified
+      });
+    }
+    const now=new Date();
+    const response=await fetch(url+"/analyze",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","X-Dashboard-Token":token},
+      body:JSON.stringify({
+        symbol:"EURUSD",timezone:"Asia/Kuala_Lumpur",
+        analysisRequestedAt:now.toISOString(),
+        analysisRequestedAtMalaysia:localDateTime(now),images
+      })
+    });
+    const responseText=await response.text();
+    let data;
+    try { data=JSON.parse(responseText); }
+    catch(parseError) {
+      throw new Error("Worker returned a non-JSON response (HTTP "+response.status+"). Preview: "+responseText.slice(0,700));
+    }
+    if(!response.ok) {
+      if (response.status === 429 && data.quota?.code === "OPENROUTER_FREE_DAILY_QUOTA_EXHAUSTED") {
+        const resetMs = data.quota.retryAt ? Date.parse(data.quota.retryAt) : 0;
+        if (Number.isFinite(resetMs) && resetMs > Date.now()) localStorage.setItem("eurusd_openrouter_quota_reset_ms", String(resetMs));
+        const when = data.quota.retryAtMalaysia || (resetMs ? new Date(resetMs).toLocaleString("en-MY", {timeZone:"Asia/Kuala_Lumpur"}) : "the provider's next daily reset");
+        setStatus("OpenRouter free daily quota exhausted. All further AI requests stopped. Retry after " + when + " Malaysia time. Screenshots are retained; no payment is required.", "bad");
+        applyQuotaLock();
+        $("rawResponse").textContent=JSON.stringify({code:data.code,quota:data.quota,diagnostic:data.diagnostic},null,2);
+        return;
+      }
+      const diagnostic=data.diagnostic ? "\nDiagnostic: "+JSON.stringify(data.diagnostic,null,2) : "";
+      throw new Error((data.error||"Request failed: "+response.status)+diagnostic);
+    }
+    if(!data.success)throw new Error(data.error||"Analysis failed.");
+    const displayed = render(data);
+    $("rawResponse").textContent=JSON.stringify({version:data.version,model:data.model,synthesisStatus:data.synthesisStatus,synthesisError:data.synthesisError,diagnostic:data.diagnostic,analysis:data.analysis},null,2);
+    if (displayed) {
+      setStatus("Analysis completed at "+localDateTime()+". Results displayed. Verify all readings on FXGT. Model: "+(data.model||"free route")+". Synthesis: "+(data.synthesisStatus||"not reported")+".","good");
+    } else {
+      setStatus("Worker responded, but no valid timeframe data was displayed. Check the full AI response below.","bad");
+    }
+  } catch(e) {
+    latest=null;$("rawResponse").textContent="Analysis failed.";
+    setStatus("Analysis failed: "+e.message+"\nScreenshots are retained. You can retry.","bad");
+  } finally {
+    if (!applyQuotaLock()) { $("analyseBtn").disabled=false; $("recheckBtn").disabled=false; }
+  }
+}
+$("analyseBtn").onclick=analyse;
+$("recheckBtn").onclick=analyse;
+$("uploadNextTfBtn").onclick=()=>{
+  if(!ORDER.includes(recommendedNextTf)) return;
+  const input=document.querySelector(`input[type=file][data-tf="${recommendedNextTf}"]`);
+  if(input) input.click();
+};
+$("clearBtn").onclick=()=>{
+  ORDER.forEach(clearTimeframe);
+  filesByTf={};latest=null;clearResults();
+  $("rawResponse").textContent="No response yet.";
+  setStatus("All screenshots cleared. Upload four fresh detailed close-ups when ready.");
+};
+updateCaptureGrid();
 </script>
 </body>
 </html>
